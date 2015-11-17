@@ -9,9 +9,14 @@ class Scene
 end
 
 
-# this is the "main room" in which you can access the other scenes
-class MainRoom < Scene
 
+# this is the "main room" in which you can access the other scenes
+ class MainRoom #< Scene
+ 	# make all the keys false class var, so as player completes a room, they set the key val=true
+ 	@@key_one = false
+ 	@@key_two = false
+ 	@@key_three = false
+ 	@@key_four = false
 
 	def enter
 		puts "Hello, and welcome to the game. The last thing you 
@@ -19,42 +24,61 @@ class MainRoom < Scene
 		Suddenly you find yourself in a strange room."
 		puts "The room has 5 doors. One door has 4 locks on it. Choose a door number\nto go in."
 		
-		
-		@key_one = "hi"
-
 		choice = $stdin.gets.chomp
 
-		if	choice.include? "1"	
-			if @key_one == true
-			 	puts "You already did that room"
-
+		if choice.include? "1"	
+			# checks if the player has already selected 1 and made it back to main room
+			if @@key_one == true 
+				puts "You already completed that room."
+				return "main_room"
 			else
+				@@key_one = true
 				return "ganja_room"
 			end
-		end 
-
 		
-
-		
-
-		
-		if choice.include? "2"
-			return "oppression_room"
+		elsif choice.include? "2"
+			if @@key_two == true
+				return "main_room"
+			else
+				@@key_two = true
+				return "oppression_room"
+			end
 		elsif choice.include? "3"
-			return "purgatory"
+			if @@key_three == true
+				puts "You already completed that room."
+				return "main_room"
+			else 
+				@@key_three = true
+				return "mancave"
+			end
 		elsif choice.include? "4"
-			return "election_room"
+			if @@key_four == true
+				puts "You already completed this room."
+			else
+				@@key_four = true
+				return "election_room"
+				
+			end
+
+		elsif choice.include? "5" 
+			if ((@@key_four == true && @@key_three == true) && (@@key_two == true && @@key_one == true))
+				return "purgatory"
+			else
+				puts "***You still need to retrieve all the keys from rooms 1-4.***"
+				return "main_room"
+			end
+
 		else 
 			puts "Quit bein a wise guy and pick a door number."
 		end
 	end
 
-	def room_one_done
+	# def room_one_done
 
-		## maybe set a @variable and make it from false => true
-		@key_one = true
-	return	
-	end
+	# 	## maybe set a @variable and make it from false => true
+	# 	@key_one = true
+	# return	
+	# end
 end
 
 ####### I don't want to repeat all this code. Need a way to tell the MainRoom class
@@ -163,9 +187,8 @@ class GanjaRoom < Scene
 				if math == 59
 					puts "Wow! You can do math after smoking 4 joints! Here's a key!"
 					puts "* You got the key for room one! *"
-					$one_done = true
-					# Keys.room_one_key
-					return $one_done.room_one_done
+					
+					
 					return "main_room"
 			
 				else 
@@ -383,7 +406,58 @@ end
 class Mancave < Scene
 	
 	def enter()
-	
+		puts "Welcome to the Mancave. As you enter, your pupils dilate because of the dim lighting,
+		\n and your nose picks up a strange smell. What could the smell be? > "
+
+		smell = $stdin.gets.chomp
+
+
+		if smell.include? "farts" 
+			puts "You're exactly right! What a dank cave."
+			puts "As you settle down on the couch, a fat nerdy manboy sits across from you. 
+			\nYou see a multitude of games, but only one that matters."
+			puts "Super Smash Bros lights up the television, and your opponent awaits."
+			puts "Choose your character: > "
+			character = $stdin.gets.chomp
+			puts "Ahh, so you chose #{character} eh? Well the manboy chose Fox. Uh oh."
+			puts "What is the one kick you have to dodge to win?"
+			kick = $stdin.gets.chomp
+			if kick.include? "up"
+				# get the third key here
+				puts " HAH! You've beaten him! You beat the manboy in his own cave! Well done. 
+				\n Take the key, his bag of cheez-its, and his dignity on your way out."
+				return "main_room"
+			else 
+				puts "Noooo! You've been defeated. Not even telling the manboy's mother will save you now. Get rekt."
+				return "loser"
+			end
+			# gives the player a second chance after 1st wrong answer
+		else
+			puts "You are mistaken, friend. The manboy is actually a gassy pothead."
+			puts "To continue: what is the name of Mario's arch nemesis? > "
+			nemesis = $stdin.gets.chomp
+			if nemesis.include? "owser"
+				puts "You've got it, mate."
+				puts "Super Smash Bros lights up the television, and your opponent awaits."
+				puts "Choose your character: > "
+				character = $stdin.gets.chomp
+				puts "Ahh, so you chose #{character} eh? Well the manboy chose Fox. Uh oh."
+				puts "What is the one kick you have to dodge to win?"
+				kick = $stdin.gets.chomp
+				if kick.include? "up"
+					puts " HAH! You've beaten him! You beat the manboy in his own cave! Well done. 
+					\n Take the key, his bag of cheez-its, and his dignity on your way out."
+					return "main_room"
+				else 
+					puts "Noooo! You've been defeated. Not even telling the manboy's mother will save you now. Get rekt."
+					return "loser"
+					
+				end
+			else 
+				puts "Cmon man, didn't you have a childhood?"
+				return "loser"
+			end
+		end
 	end
 end
 
@@ -397,7 +471,7 @@ end
 
 class YouLose < Scene
 	def enter()
-		puts "Hah it sucks to lose at easy games."
+		puts "Hah it sucks to lose at easy games. G'day m8."
 		exit()
 	end
 end
@@ -426,7 +500,7 @@ end
 class RoomMap 
 	@@map = {
 		'main_room' => MainRoom.new(),
-		'ganja_room' => GanjaRoom.new(MainRoom.new()),
+		'ganja_room' => GanjaRoom.new(),
 		'purgatory'  => Purgatory.new(),
 		'heaven' => Heaven.new(),
 		'oppression_room' => OppressionRoom.new(),
